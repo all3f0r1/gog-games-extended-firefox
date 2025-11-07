@@ -1,0 +1,235 @@
+/**
+ * GOG Games Extended - Styles CSS
+ * Styles pour les galeries de médias injectées
+ */
+
+/* Conteneur principal */
+.gge-media-container {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* En-tête */
+.gge-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.gge-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.gge-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.gge-header a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.gge-header a:hover {
+  color: #ffed4e;
+  text-decoration: underline;
+}
+
+/* Galeries communes */
+.gge-screenshots-gallery,
+.gge-videos-gallery {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.gge-screenshots-gallery h3,
+.gge-videos-gallery h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.4rem;
+  color: #333;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+/* Grille de screenshots */
+.gge-screenshots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.gge-screenshot-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #f0f0f0;
+  aspect-ratio: 16 / 9;
+}
+
+.gge-screenshot-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.gge-screenshot-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.gge-screenshot-item:hover img {
+  opacity: 0.9;
+}
+
+/* Grille de vidéos */
+.gge-videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.gge-video-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #000;
+  aspect-ratio: 16 / 9;
+}
+
+.gge-video-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.gge-video-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.gge-video-item:hover img {
+  opacity: 0.7;
+}
+
+/* Bouton play pour les vidéos */
+.gge-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #667eea;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.gge-video-item:hover .gge-play-button {
+  background: rgba(255, 255, 255, 1);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Iframe YouTube */
+.gge-video-item iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .gge-media-container {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .gge-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .gge-screenshots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .gge-videos-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .gge-screenshots-gallery,
+  .gge-videos-gallery {
+    padding: 1rem;
+  }
+
+  .gge-play-button {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gge-screenshots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Animation de chargement */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gge-media-container {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.gge-screenshot-item,
+.gge-video-item {
+  animation: fadeIn 0.4s ease-out backwards;
+}
+
+.gge-screenshot-item:nth-child(n) {
+  animation-delay: calc(0.05s * var(--item-index, 0));
+}
+
+.gge-video-item:nth-child(n) {
+  animation-delay: calc(0.1s * var(--item-index, 0));
+}

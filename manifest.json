@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "GOG Games Extended",
+  "version": "1.0.0",
+  "description": "Enrichit les pages de gog-games.to avec des médias (images et vidéos) provenant de GOG Database",
+  "author": "Manus AI",
+  
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  
+  "host_permissions": [
+    "*://gog-games.to/*",
+    "https://www.gogdb.org/*",
+    "https://images.gog-statics.com/*"
+  ],
+  
+  "content_scripts": [
+    {
+      "matches": ["*://gog-games.to/game/*"],
+      "js": ["src/content-script.js"],
+      "css": ["src/styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "permissions": []
+}
