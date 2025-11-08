@@ -1,0 +1,42 @@
+# Changelog
+
+Toutes les modifications notables de ce projet seront documentées dans ce fichier.
+
+## [1.2.0] - 2025-11-08
+
+### 🔧 Corrections
+- **Fix CORS**: Les content scripts ne peuvent pas utiliser les `host_permissions` dans Firefox
+- Ajout d'un **background script** pour gérer les requêtes API vers GOGDB
+- Communication entre content script et background script via `browser.runtime.sendMessage`
+
+### 📝 Détails techniques
+Les content scripts sont exécutés dans le contexte de la page web et sont soumis aux restrictions CORS, même avec les permissions déclarées dans le manifest. Seuls les background scripts peuvent effectuer des requêtes cross-origin en utilisant les `host_permissions`.
+
+**Architecture mise à jour** :
+1. Content script détecte le lien GOGDB et extrait le product ID
+2. Content script envoie un message au background script avec le product ID
+3. Background script effectue la requête vers l'API GOGDB (bypass CORS)
+4. Background script renvoie les données au content script
+5. Content script injecte les galeries dans la page
+
+## [1.1.0] - 2025-11-08
+
+### ✨ Nouvelles fonctionnalités
+- Support pour les Single Page Applications (SPA)
+- Ajout d'un **MutationObserver** pour détecter le chargement dynamique du contenu
+- Détection des changements d'URL pour la navigation SPA
+- Protection contre les injections multiples
+
+### 🐛 Corrections
+- L'extension attend maintenant que le contenu soit chargé avant de chercher le lien GOGDB
+- Gestion correcte du menu déroulant "More" qui contient les liens
+
+## [1.0.0] - 2025-11-07
+
+### 🎉 Version initiale
+- Galerie de captures d'écran avec lazy loading
+- Galerie de vidéos YouTube intégrées
+- Design moderne avec dégradé violet/bleu
+- Animations fluides
+- Support responsive pour mobile
+- Documentation complète

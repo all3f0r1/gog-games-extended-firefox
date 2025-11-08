@@ -1,7 +1,7 @@
 /**
  * GOG Games Extended - Content Script
  * Enrichit les pages de gog-games.to avec des médias provenant de GOG Database
- * Version 1.1.0 - Support pour SPA (Single Page Application)
+ * Version 1.2.0 - Support pour SPA + Background script pour CORS
  */
 
 (function() {
@@ -31,22 +31,26 @@
     return null;
   }
 
-  // Fonction pour récupérer les données depuis GOGDB
+  // Fonction pour récupérer les données depuis GOGDB via le background script
   async function fetchGOGDBData(productId) {
     try {
-      const url = `https://www.gogdb.org/data/products/${productId}/product.json`;
-      console.log('[GOG Games Extended] Récupération des données:', url);
+      console.log('[GOG Games Extended] Envoi de la requête au background script pour product ID:', productId);
       
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Envoyer un message au background script
+      const response = await browser.runtime.sendMessage({
+        action: 'fetchGOGDBData',
+        productId: productId
+      });
+      
+      if (response.success) {
+        console.log('[GOG Games Extended] Données récupérées:', response.data);
+        return response.data;
+      } else {
+        console.error('[GOG Games Extended] Erreur du background script:', response.error);
+        return null;
       }
-      
-      const data = await response.json();
-      console.log('[GOG Games Extended] Données récupérées:', data);
-      return data;
     } catch (error) {
-      console.error('[GOG Games Extended] Erreur lors de la récupération des données:', error);
+      console.error('[GOG Games Extended] Erreur lors de la communication avec le background script:', error);
       return null;
     }
   }
