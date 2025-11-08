@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2025-11-08
+
+### 🐛 Bug Fixes - AMO Validation
+- **Added extension ID**: `gog-games-extended@manus.ai` in manifest (required for Manifest V3)
+- **Added data_collection_permissions**: Explicitly set all to false (no data collection)
+- **Fixed icon sizes**: Resized icons from 1024x1024 to correct sizes (48x48 and 96x96)
+- **Removed innerHTML**: Replaced all `innerHTML` usage with secure DOM methods
+  - `createErrorMessage()`: Now uses `createElement()` and `textContent`
+  - `createNoMediaMessage()`: Now uses `createElement()` and `textContent`
+  - Video gallery: Now uses `textContent` for play button
+  - Header: Now uses `createElement()` for all elements
+
+### 🔒 Security Improvements
+- All dynamic content now created using secure DOM manipulation
+- No more unsafe `innerHTML` assignments
+- Better protection against XSS attacks
+
+### 📝 Technical Details
+These changes were required to pass Firefox Add-ons (AMO) validation. The extension now follows all Mozilla security and quality guidelines.
+
 ## [1.3.1] - 2025-11-08
 
 ### 🐛 Critical Bug Fix

@@ -1,7 +1,7 @@
 /**
  * GOG Games Extended - Content Script
  * Enriches gog-games.to pages with media from GOG Database
- * Version 1.3.1 - Fix SPA navigation from homepage
+ * Version 1.3.2 - AMO validation fixes
  */
 
 (function() {
@@ -131,10 +131,13 @@
 
           const playButton = document.createElement('div');
           playButton.className = 'gge-play-button';
-          playButton.innerHTML = '▶';
+          playButton.textContent = '▶';
 
           item.onclick = () => {
-            item.innerHTML = '';
+            // Clear item content safely
+            while (item.firstChild) {
+              item.removeChild(item.firstChild);
+            }
             const iframe = document.createElement('iframe');
             iframe.src = video.video_url;
             iframe.width = '100%';
@@ -161,11 +164,21 @@
   function createErrorMessage(error) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'gge-error';
-    errorDiv.innerHTML = `
-      <strong>⚠️ Unable to load media</strong>
-      <p>Failed to retrieve data from GOG Database. This may be due to a network issue or the game not being available in the database.</p>
-      <p><small>Error: ${error}</small></p>
-    `;
+    
+    const strong = document.createElement('strong');
+    strong.textContent = '⚠️ Unable to load media';
+    errorDiv.appendChild(strong);
+    
+    const p1 = document.createElement('p');
+    p1.textContent = 'Failed to retrieve data from GOG Database. This may be due to a network issue or the game not being available in the database.';
+    errorDiv.appendChild(p1);
+    
+    const p2 = document.createElement('p');
+    const small = document.createElement('small');
+    small.textContent = `Error: ${error}`;
+    p2.appendChild(small);
+    errorDiv.appendChild(p2);
+    
     return errorDiv;
   }
 
@@ -173,10 +186,15 @@
   function createNoMediaMessage() {
     const infoDiv = document.createElement('div');
     infoDiv.className = 'gge-info';
-    infoDiv.innerHTML = `
-      <strong>ℹ️ No media available</strong>
-      <p>This game doesn't have any screenshots or videos in the GOG Database yet.</p>
-    `;
+    
+    const strong = document.createElement('strong');
+    strong.textContent = 'ℹ️ No media available';
+    infoDiv.appendChild(strong);
+    
+    const p = document.createElement('p');
+    p.textContent = "This game doesn't have any screenshots or videos in the GOG Database yet.";
+    infoDiv.appendChild(p);
+    
     return infoDiv;
   }
 
@@ -208,7 +226,19 @@
 
     const header = document.createElement('div');
     header.className = 'gge-header';
-    header.innerHTML = '<h2>🎮 GOG Database Media</h2><p>Provided by <a href="https://www.gogdb.org" target="_blank">GOG Database</a></p>';
+    
+    const h2 = document.createElement('h2');
+    h2.textContent = '🎮 GOG Database Media';
+    header.appendChild(h2);
+    
+    const p = document.createElement('p');
+    p.textContent = 'Provided by ';
+    const link = document.createElement('a');
+    link.href = 'https://www.gogdb.org';
+    link.target = '_blank';
+    link.textContent = 'GOG Database';
+    p.appendChild(link);
+    header.appendChild(p);
     mediaContainer.appendChild(header);
 
     // Handle errors
