@@ -1,21 +1,21 @@
 /**
  * GOG Games Extended - Background Script
- * Gère les requêtes API vers GOGDB (contournement CORS)
+ * Handles API requests to GOGDB (CORS bypass)
  */
 
-console.log('[GOG Games Extended] Background script chargé');
+console.log('[GOG Games Extended] Background script loaded');
 
-// Écouter les messages du content script
+// Listen for messages from content script
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('[GOG Games Extended] Message reçu:', message);
+  console.log('[GOG Games Extended] Message received:', message);
 
   if (message.action === 'fetchGOGDBData') {
     const productId = message.productId;
     const url = `https://www.gogdb.org/data/products/${productId}/product.json`;
     
-    console.log('[GOG Games Extended] Récupération des données:', url);
+    console.log('[GOG Games Extended] Fetching data:', url);
 
-    // Effectuer la requête avec les permissions du background script
+    // Perform request with background script permissions
     fetch(url)
       .then(response => {
         if (!response.ok) {
@@ -24,15 +24,15 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return response.json();
       })
       .then(data => {
-        console.log('[GOG Games Extended] Données récupérées avec succès');
+        console.log('[GOG Games Extended] Data retrieved successfully');
         sendResponse({ success: true, data: data });
       })
       .catch(error => {
-        console.error('[GOG Games Extended] Erreur lors de la récupération:', error);
+        console.error('[GOG Games Extended] Error during fetch:', error);
         sendResponse({ success: false, error: error.message });
       });
 
-    // Retourner true pour indiquer qu'on va répondre de manière asynchrone
+    // Return true to indicate async response
     return true;
   }
 });

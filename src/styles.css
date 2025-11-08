@@ -1,69 +1,97 @@
 /**
  * GOG Games Extended - Styles CSS
- * Styles pour les galeries de médias injectées
+ * Styles adapted to match gog-games.to visual design
  */
 
-/* Conteneur principal */
+/* Main container - matches site's style */
 .gge-media-container {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin: 1.5rem 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-/* En-tête */
+/* Header section */
 .gge-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: white;
+  text-align: left;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-left: 4px solid #6a4da5;
 }
 
 .gge-header h2 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
 }
 
 .gge-header p {
   margin: 0;
   font-size: 0.9rem;
-  opacity: 0.9;
+  color: #666;
 }
 
 .gge-header a {
-  color: #ffd700;
+  color: #6a4da5;
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .gge-header a:hover {
-  color: #ffed4e;
+  color: #8b6bb7;
   text-decoration: underline;
 }
 
-/* Galeries communes */
+/* Error message */
+.gge-error {
+  padding: 1rem;
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  color: #856404;
+  margin-bottom: 1rem;
+}
+
+.gge-error strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* Info message (no media) */
+.gge-info {
+  padding: 1rem;
+  background: #d1ecf1;
+  border-left: 4px solid #17a2b8;
+  color: #0c5460;
+  margin-bottom: 1rem;
+}
+
+/* Galleries - cleaner style */
 .gge-screenshots-gallery,
 .gge-videos-gallery {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-left: 4px solid #6a4da5;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .gge-screenshots-gallery h3,
 .gge-videos-gallery h3 {
   margin: 0 0 1rem 0;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: #333;
-  border-bottom: 3px solid #667eea;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
   padding-bottom: 0.5rem;
 }
 
-/* Grille de screenshots */
+/* Screenshots grid */
 .gge-screenshots-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -74,16 +102,18 @@
 .gge-screenshot-item {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background: #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #e0e0e0;
   aspect-ratio: 16 / 9;
+  border: 2px solid transparent;
 }
 
 .gge-screenshot-item:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #6a4da5;
 }
 
 .gge-screenshot-item img {
@@ -91,34 +121,36 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .gge-screenshot-item:hover img {
   opacity: 0.9;
 }
 
-/* Grille de vidéos */
+/* Videos grid */
 .gge-videos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 1rem;
   margin-top: 1rem;
 }
 
 .gge-video-item {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   background: #000;
   aspect-ratio: 16 / 9;
+  border: 2px solid transparent;
 }
 
 .gge-video-item:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #6a4da5;
 }
 
 .gge-video-item img {
@@ -126,14 +158,14 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .gge-video-item:hover img {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-/* Bouton play pour les vidéos */
+/* Play button */
 .gge-play-button {
   position: absolute;
   top: 50%;
@@ -141,40 +173,43 @@
   transform: translate(-50%, -50%);
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(106, 77, 165, 0.9);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: #667eea;
-  transition: all 0.3s ease;
+  color: white;
+  transition: all 0.2s ease;
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .gge-video-item:hover .gge-play-button {
-  background: rgba(255, 255, 255, 1);
+  background: rgba(106, 77, 165, 1);
   transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* Iframe YouTube */
+/* YouTube iframe */
 .gge-video-item iframe {
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .gge-media-container {
-    padding: 1rem;
     margin: 1rem 0;
   }
 
+  .gge-header {
+    padding: 0.75rem;
+  }
+
   .gge-header h2 {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
 
   .gge-screenshots-grid {
@@ -189,7 +224,7 @@
 
   .gge-screenshots-gallery,
   .gge-videos-gallery {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .gge-play-button {
@@ -205,11 +240,11 @@
   }
 }
 
-/* Animation de chargement */
+/* Fade in animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -218,18 +253,35 @@
 }
 
 .gge-media-container {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .gge-screenshot-item,
 .gge-video-item {
-  animation: fadeIn 0.4s ease-out backwards;
+  animation: fadeIn 0.3s ease-out backwards;
 }
 
-.gge-screenshot-item:nth-child(n) {
-  animation-delay: calc(0.05s * var(--item-index, 0));
+/* Loading indicator */
+.gge-loading {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }
 
-.gge-video-item:nth-child(n) {
-  animation-delay: calc(0.1s * var(--item-index, 0));
+.gge-loading::after {
+  content: '...';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60%, 100% {
+    content: '...';
+  }
 }

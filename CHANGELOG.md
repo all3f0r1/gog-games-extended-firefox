@@ -1,6 +1,25 @@
 # Changelog
 
-Toutes les modifications notables de ce projet seront documentées dans ce fichier.
+All notable changes to this project will be documented in this file.
+
+## [1.3.0] - 2025-11-08
+
+### ✨ New Features
+- **Better visual integration**: CSS redesigned to match gog-games.to style
+- **Error handling**: Clear messages when API fails or no media is found
+- **English translation**: All text content translated to English
+
+### 🎨 Design Changes
+- Removed gradient background, using simple gray to match site
+- Cleaner borders and sections matching site's design
+- Purple accent color (#6a4da5) matching site theme
+- Simplified animations and transitions
+- Better responsive design
+
+### 🐛 Bug Fixes
+- Error messages now displayed when GOGDB API fails
+- Info message shown when game has no media
+- Better error logging for debugging
 
 ## [1.2.1] - 2025-11-08
 

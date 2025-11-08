@@ -1,71 +1,66 @@
 /**
  * GOG Games Extended - Content Script
- * Enrichit les pages de gog-games.to avec des médias provenant de GOG Database
- * Version 1.2.1 - Fix injection timing and placement
+ * Enriches gog-games.to pages with media from GOG Database
+ * Version 1.3.0 - Better styling, error handling, and English translation
  */
 
 (function() {
   'use strict';
 
-  console.log('[GOG Games Extended] Extension chargée');
+  console.log('[GOG Games Extended] Extension loaded');
 
   let mediaInjected = false;
   let currentUrl = window.location.href;
   let processingInProgress = false;
 
-  // Fonction pour extraire le product ID depuis le lien GOGDB
+  // Extract product ID from GOGDB link
   function extractProductId() {
-    // Le lien GOGDB est caché dans un menu déroulant
-    // Il faut d'abord s'assurer que le contenu est chargé
     const gogdbLink = document.querySelector('a[href*="gogdb.org/product/"]');
     if (!gogdbLink) {
-      console.log('[GOG Games Extended] Lien GOGDB non trouvé (contenu peut-être pas encore chargé)');
+      console.log('[GOG Games Extended] GOGDB link not found (content may not be loaded yet)');
       return null;
     }
 
     const match = gogdbLink.href.match(/\/product\/(\d+)/);
     if (match && match[1]) {
-      console.log('[GOG Games Extended] Product ID trouvé:', match[1]);
+      console.log('[GOG Games Extended] Product ID found:', match[1]);
       return match[1];
     }
 
     return null;
   }
 
-  // Fonction pour récupérer les données depuis GOGDB via le background script
+  // Fetch data from GOGDB via background script
   async function fetchGOGDBData(productId) {
     try {
-      console.log('[GOG Games Extended] Envoi de la requête au background script pour product ID:', productId);
+      console.log('[GOG Games Extended] Sending request to background script for product ID:', productId);
       
-      // Envoyer un message au background script
       const response = await browser.runtime.sendMessage({
         action: 'fetchGOGDBData',
         productId: productId
       });
       
       if (response.success) {
-        console.log('[GOG Games Extended] Données récupérées avec succès');
-        return response.data;
+        console.log('[GOG Games Extended] Data retrieved successfully');
+        return { success: true, data: response.data };
       } else {
-        console.error('[GOG Games Extended] Erreur du background script:', response.error);
-        return null;
+        console.error('[GOG Games Extended] Background script error:', response.error);
+        return { success: false, error: response.error };
       }
     } catch (error) {
-      console.error('[GOG Games Extended] Erreur lors de la communication avec le background script:', error);
-      return null;
+      console.error('[GOG Games Extended] Error communicating with background script:', error);
+      return { success: false, error: error.message };
     }
   }
 
-  // Fonction pour construire l'URL d'une image à partir du hash
+  // Build image URL from hash
   function buildImageUrl(hash, size = 'ggvgm') {
     if (!hash) return null;
-    // Format: https://images.gog-statics.com/{hash}_{size}.jpg
-    // _ggvgm pour miniatures, .jpg pour pleine résolution
     const suffix = size === 'full' ? '.jpg' : '_ggvgm.jpg';
     return `https://images.gog-statics.com/${hash}${suffix}`;
   }
 
-  // Fonction pour créer la galerie de screenshots
+  // Create screenshots gallery
   function createScreenshotsGallery(screenshots) {
     if (!screenshots || screenshots.length === 0) {
       return null;
@@ -75,7 +70,7 @@
     gallery.className = 'gge-screenshots-gallery';
 
     const title = document.createElement('h3');
-    title.textContent = `📸 Captures d'écran (${screenshots.length})`;
+    title.textContent = `📸 Screenshots (${screenshots.length})`;
     gallery.appendChild(title);
 
     const grid = document.createElement('div');
@@ -87,6 +82,7 @@
 
       const item = document.createElement('div');
       item.className = 'gge-screenshot-item';
+      item.title = 'Click to view full resolution';
 
       const img = document.createElement('img');
       img.src = thumbnailUrl;
@@ -102,7 +98,7 @@
     return gallery;
   }
 
-  // Fonction pour créer la galerie de vidéos
+  // Create videos gallery
   function createVideosGallery(videos) {
     if (!videos || videos.length === 0) {
       return null;
@@ -112,7 +108,7 @@
     gallery.className = 'gge-videos-gallery';
 
     const title = document.createElement('h3');
-    title.textContent = `🎬 Vidéos (${videos.length})`;
+    title.textContent = `🎬 Videos (${videos.length})`;
     gallery.appendChild(title);
 
     const grid = document.createElement('div');
@@ -121,16 +117,16 @@
     videos.forEach((video, index) => {
       const item = document.createElement('div');
       item.className = 'gge-video-item';
+      item.title = 'Click to play video';
 
       if (video.provider === 'youtube') {
-        // Extraire l'ID YouTube de l'URL
         const videoIdMatch = video.video_url.match(/embed\/([^?]+)/);
         if (videoIdMatch) {
           const videoId = videoIdMatch[1];
           
           const thumbnail = document.createElement('img');
           thumbnail.src = video.thumbnail_url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-          thumbnail.alt = `Vidéo ${index + 1}`;
+          thumbnail.alt = `Video ${index + 1}`;
           thumbnail.loading = 'lazy';
 
           const playButton = document.createElement('div');
@@ -138,7 +134,6 @@
           playButton.innerHTML = '▶';
 
           item.onclick = () => {
-            // Remplacer la miniature par un iframe YouTube
             item.innerHTML = '';
             const iframe = document.createElement('iframe');
             iframe.src = video.video_url;
@@ -162,43 +157,87 @@
     return gallery;
   }
 
-  // Fonction pour trouver le meilleur point d'insertion
+  // Create error message
+  function createErrorMessage(error) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'gge-error';
+    errorDiv.innerHTML = `
+      <strong>⚠️ Unable to load media</strong>
+      <p>Failed to retrieve data from GOG Database. This may be due to a network issue or the game not being available in the database.</p>
+      <p><small>Error: ${error}</small></p>
+    `;
+    return errorDiv;
+  }
+
+  // Create info message (no media)
+  function createNoMediaMessage() {
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'gge-info';
+    infoDiv.innerHTML = `
+      <strong>ℹ️ No media available</strong>
+      <p>This game doesn't have any screenshots or videos in the GOG Database yet.</p>
+    `;
+    return infoDiv;
+  }
+
+  // Find best insertion point
   function findInsertionPoint() {
-    // Chercher le titre du jeu (h1 ou h2)
     const gameTitle = document.querySelector('h1, h2');
     if (gameTitle) {
       return { element: gameTitle, position: 'afterend' };
     }
 
-    // Fallback: chercher le bouton "More"
     const moreButton = Array.from(document.querySelectorAll('label')).find(l => l.textContent.trim() === 'More');
     if (moreButton && moreButton.parentElement) {
       return { element: moreButton.parentElement, position: 'afterend' };
     }
 
-    // Dernier recours: body
     return { element: document.body, position: 'beforeend' };
   }
 
-  // Fonction pour injecter les galeries dans la page
-  function injectMediaGalleries(data) {
-    // Vérifier si déjà injecté
+  // Inject media galleries into page
+  function injectMediaGalleries(result) {
     if (document.getElementById('gge-media-container')) {
-      console.log('[GOG Games Extended] Galeries déjà injectées, skip');
+      console.log('[GOG Games Extended] Galleries already injected, skipping');
       return;
     }
 
-    // Créer le conteneur principal pour les médias
     const mediaContainer = document.createElement('div');
     mediaContainer.className = 'gge-media-container';
     mediaContainer.id = 'gge-media-container';
 
     const header = document.createElement('div');
     header.className = 'gge-header';
-    header.innerHTML = '<h2>🎮 Médias GOG Database</h2><p>Fourni par <a href="https://www.gogdb.org" target="_blank">GOG Database</a></p>';
+    header.innerHTML = '<h2>🎮 GOG Database Media</h2><p>Provided by <a href="https://www.gogdb.org" target="_blank">GOG Database</a></p>';
     mediaContainer.appendChild(header);
 
-    // Ajouter les vidéos en premier (plus attractif)
+    // Handle errors
+    if (!result.success) {
+      const errorMsg = createErrorMessage(result.error);
+      mediaContainer.appendChild(errorMsg);
+      const insertion = findInsertionPoint();
+      insertion.element.insertAdjacentElement(insertion.position, mediaContainer);
+      console.log('[GOG Games Extended] Error message displayed');
+      mediaInjected = true;
+      return;
+    }
+
+    const data = result.data;
+    const hasMedia = (data.screenshots && data.screenshots.length > 0) || 
+                     (data.videos && data.videos.length > 0);
+    
+    // No media available
+    if (!hasMedia) {
+      const noMediaMsg = createNoMediaMessage();
+      mediaContainer.appendChild(noMediaMsg);
+      const insertion = findInsertionPoint();
+      insertion.element.insertAdjacentElement(insertion.position, mediaContainer);
+      console.log('[GOG Games Extended] No media message displayed');
+      mediaInjected = true;
+      return;
+    }
+
+    // Add videos first (more engaging)
     if (data.videos && data.videos.length > 0) {
       const videosGallery = createVideosGallery(data.videos);
       if (videosGallery) {
@@ -206,7 +245,7 @@
       }
     }
 
-    // Ajouter les screenshots
+    // Add screenshots
     if (data.screenshots && data.screenshots.length > 0) {
       const screenshotsGallery = createScreenshotsGallery(data.screenshots);
       if (screenshotsGallery) {
@@ -214,113 +253,87 @@
       }
     }
 
-    // Trouver le meilleur point d'insertion
     const insertion = findInsertionPoint();
     insertion.element.insertAdjacentElement(insertion.position, mediaContainer);
 
-    console.log('[GOG Games Extended] Galeries injectées avec succès');
+    console.log('[GOG Games Extended] Galleries injected successfully');
     mediaInjected = true;
   }
 
-  // Fonction principale
+  // Main processing function
   async function processPage() {
-    // Vérifier qu'on est bien sur une page de jeu
     if (!window.location.pathname.startsWith('/game/')) {
-      console.log('[GOG Games Extended] Pas une page de jeu');
+      console.log('[GOG Games Extended] Not a game page');
       return;
     }
 
-    // Réinitialiser si on change de page
+    // Reset if URL changed
     if (currentUrl !== window.location.href) {
       mediaInjected = false;
       processingInProgress = false;
       currentUrl = window.location.href;
-      // Supprimer l'ancien conteneur s'il existe
       const oldContainer = document.getElementById('gge-media-container');
       if (oldContainer) {
         oldContainer.remove();
       }
     }
 
-    // Ne pas réinjecter si déjà fait ou en cours
+    // Skip if already processed or in progress
     if (mediaInjected || processingInProgress) {
       return;
     }
 
-    // Marquer comme en cours de traitement
     processingInProgress = true;
 
-    // Attendre que le lien GOGDB soit disponible
+    // Wait for GOGDB link to be available
     const productId = extractProductId();
     if (!productId) {
-      console.log('[GOG Games Extended] Product ID non disponible, réessai plus tard');
+      console.log('[GOG Games Extended] Product ID not available, will retry later');
       processingInProgress = false;
       return;
     }
 
-    // Récupérer les données GOGDB
-    const data = await fetchGOGDBData(productId);
-    if (!data) {
-      console.log('[GOG Games Extended] Impossible de récupérer les données');
-      processingInProgress = false;
-      mediaInjected = true; // Marquer comme traité pour ne pas réessayer indéfiniment
-      return;
-    }
-
-    // Vérifier qu'il y a des médias à afficher
-    const hasMedia = (data.screenshots && data.screenshots.length > 0) || 
-                     (data.videos && data.videos.length > 0);
+    // Fetch data from GOGDB
+    const result = await fetchGOGDBData(productId);
     
-    if (!hasMedia) {
-      console.log('[GOG Games Extended] Aucun média trouvé pour ce jeu');
-      processingInProgress = false;
-      mediaInjected = true; // Marquer comme traité pour ne pas réessayer
-      return;
-    }
-
-    // Injecter les galeries
-    injectMediaGalleries(data);
+    // Inject galleries (or error/info message)
+    injectMediaGalleries(result);
     processingInProgress = false;
   }
 
-  // Observer les changements du DOM pour détecter le chargement du contenu
+  // Observe DOM changes to detect content loading
   const observer = new MutationObserver((mutations) => {
-    // Ne traiter que si pas déjà en cours et pas déjà injecté
     if (processingInProgress || mediaInjected) {
       return;
     }
 
-    // Vérifier si le lien GOGDB est maintenant disponible
     const gogdbLink = document.querySelector('a[href*="gogdb.org/product/"]');
     if (gogdbLink) {
-      console.log('[GOG Games Extended] Contenu détecté, traitement de la page');
-      // Utiliser un petit délai pour s'assurer que le DOM est stable
+      console.log('[GOG Games Extended] Content detected, processing page');
       setTimeout(() => processPage(), 500);
     }
   });
 
-  // Configuration de l'observer
   const config = {
     childList: true,
     subtree: true,
     attributes: false
   };
 
-  // Démarrer l'observation
   observer.observe(document.body, config);
 
-  // Essayer immédiatement au cas où le contenu serait déjà chargé
+  // Try immediately in case content is already loaded
   setTimeout(() => {
     processPage();
   }, 1000);
 
-  // Écouter les changements d'URL (pour les SPAs)
+  // Listen for URL changes (SPA navigation)
   let lastUrl = location.href;
   new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
       lastUrl = url;
-      console.log('[GOG Games Extended] URL changée, réinitialisation');
+      console.log('[GOG Games Extended] URL changed, resetting');
       mediaInjected = false;
       processingInProgress = false;
       currentUrl = url;
@@ -328,6 +341,6 @@
     }
   }).observe(document, {subtree: true, childList: true});
 
-  console.log('[GOG Games Extended] Observer activé');
+  console.log('[GOG Games Extended] Observer activated');
 
 })();
