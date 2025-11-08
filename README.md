@@ -2,7 +2,7 @@
 
 Une extension Firefox qui enrichit les pages de [gog-games.to](https://gog-games.to) avec des médias (captures d'écran et vidéos) provenant de [GOG Database](https://www.gogdb.org).
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-Compatible-orange.svg)
 
@@ -42,15 +42,17 @@ L'extension sera bientôt disponible sur le store officiel Firefox Add-ons.
 1. Naviguez vers n'importe quelle page de jeu sur [gog-games.to](https://gog-games.to)
    - Par exemple : https://gog-games.to/game/frostpunk_2
 
-2. L'extension détecte automatiquement la page et récupère les médias depuis GOG Database
+2. Attendez que la page charge complètement
 
-3. Une section "🎮 Médias GOG Database" apparaît avec :
+3. **Cliquez sur le bouton "More"** pour révéler les liens (le lien GOGDB doit être visible)
+
+4. Une section "🎮 Médias GOG Database" apparaît automatiquement avec :
    - Les vidéos (trailers, gameplay, etc.)
    - Les captures d'écran en haute qualité
 
-4. Cliquez sur une capture d'écran pour l'ouvrir en pleine résolution dans un nouvel onglet
+5. Cliquez sur une capture d'écran pour l'ouvrir en pleine résolution dans un nouvel onglet
 
-5. Cliquez sur une vidéo pour la lire directement sur la page
+6. Cliquez sur une vidéo pour la lire directement sur la page
 
 ## 🔧 Fonctionnement technique
 
@@ -59,18 +61,27 @@ L'extension utilise les technologies suivantes :
 ### Architecture
 
 - **Manifest V3** : Standard moderne pour les extensions Firefox
-- **Content Scripts** : Injection de code JavaScript et CSS dans les pages gog-games.to
+- **Background Script** : Gère les requêtes API pour contourner CORS
+- **Content Script** : Injecte le contenu dans les pages gog-games.to
+- **Message Passing** : Communication entre background et content scripts
 - **Host Permissions** : Autorisations pour contourner les restrictions CORS
 
 ### Workflow
 
-1. Détection de la page de jeu sur gog-games.to
-2. Extraction du lien vers GOG Database présent sur la page
-3. Récupération du Product ID depuis l'URL GOGDB
-4. Requête vers l'API JSON de GOGDB : `https://www.gogdb.org/data/products/{id}/product.json`
-5. Parsing des données (screenshots, vidéos)
-6. Construction et injection d'une galerie HTML/CSS dans la page
-7. Chargement optimisé des images (miniatures puis pleine résolution)
+1. Le content script détecte la page de jeu sur gog-games.to
+2. Un **MutationObserver** surveille le chargement dynamique du contenu (SPA)
+3. Extraction du lien vers GOG Database présent sur la page
+4. Récupération du Product ID depuis l'URL GOGDB
+5. Le content script envoie un message au background script avec le Product ID
+6. Le **background script** effectue la requête vers l'API JSON de GOGDB (bypass CORS)
+7. Le background script renvoie les données au content script
+8. Parsing des données (screenshots, vidéos)
+9. Construction et injection d'une galerie HTML/CSS dans la page
+10. Chargement optimisé des images (miniatures puis pleine résolution)
+
+### Pourquoi un background script ?
+
+Les **content scripts** sont exécutés dans le contexte de la page web et sont soumis aux restrictions CORS, même avec les permissions déclarées dans le manifest. Seuls les **background scripts** peuvent effectuer des requêtes cross-origin en utilisant les `host_permissions`.
 
 ### Permissions requises
 
@@ -80,7 +91,7 @@ L'extension demande les permissions suivantes :
 - `https://www.gogdb.org/*` : Pour récupérer les données de l'API GOGDB
 - `https://images.gog-statics.com/*` : Pour charger les images hébergées par GOG
 
-Ces permissions permettent de contourner les restrictions CORS qui bloqueraient normalement les requêtes cross-origin.
+Ces permissions permettent au background script de contourner les restrictions CORS.
 
 ## 📁 Structure du projet
 
@@ -91,8 +102,12 @@ gog-games-extended-firefox/
 │   ├── icon-48.png           # Icône 48x48
 │   └── icon-96.png           # Icône 96x96
 ├── src/                       # Code source
-│   ├── content-script.js     # Script principal injecté
+│   ├── background.js         # Background script (gestion API)
+│   ├── content-script.js     # Content script (injection UI)
 │   └── styles.css            # Styles pour les galeries
+├── CHANGELOG.md               # Historique des versions
+├── test_extension.md          # Guide de test
+├── LICENSE                    # Licence MIT
 └── README.md                  # Documentation
 ```
 
@@ -114,7 +129,8 @@ Pour modifier l'extension :
 ### Débogage
 
 - Ouvrez la console du navigateur (F12) sur une page gog-games.to
-- Les logs de l'extension sont préfixés par `[GOG Games Extended]`
+- Les logs du content script sont préfixés par `[GOG Games Extended]`
+- Pour voir les logs du background script, allez dans `about:debugging` > "Inspecter" l'extension
 - Inspectez les éléments injectés avec l'inspecteur DOM
 
 ## 🤝 Contribution
@@ -129,14 +145,14 @@ Les contributions sont les bienvenues ! Pour contribuer :
 
 ## 📝 Changelog
 
-### Version 1.0.0 (2025-11-07)
+Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des versions.
 
-- ✨ Première version publique
-- 📸 Galerie de captures d'écran avec lazy loading
-- 🎬 Galerie de vidéos YouTube intégrées
-- 🎨 Design moderne avec dégradé violet/bleu
-- ⚡ Optimisations de performance
-- 📱 Support responsive pour mobile
+### Version actuelle : 1.2.0 (2025-11-08)
+
+**🔧 Corrections critiques**
+- Fix CORS : Ajout d'un background script pour gérer les requêtes API
+- Les content scripts ne peuvent pas utiliser `host_permissions` dans Firefox
+- Communication via `browser.runtime.sendMessage` entre scripts
 
 ## ⚠️ Avertissement
 
@@ -144,7 +160,7 @@ Cette extension est un projet indépendant et n'est pas affiliée à GOG, CD Pro
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 🙏 Remerciements
 
