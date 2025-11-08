@@ -1,177 +1,210 @@
 # 🎮 GOG Games Extended
 
-Une extension Firefox qui enrichit les pages de [gog-games.to](https://gog-games.to) avec des médias (captures d'écran et vidéos) provenant de [GOG Database](https://www.gogdb.org).
+A Firefox extension that enriches [gog-games.to](https://gog-games.to) pages with media (screenshots and videos) from [GOG Database](https://www.gogdb.org).
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-Compatible-orange.svg)
 
-## ✨ Fonctionnalités
+## 📸 Screenshots
 
-Cette extension améliore votre expérience de navigation sur gog-games.to en ajoutant automatiquement :
+### Before & After
 
-- **📸 Galerie de captures d'écran** : Affiche toutes les captures d'écran disponibles sur GOG Database
-- **🎬 Galerie de vidéos** : Intègre les trailers et vidéos promotionnelles
-- **🎨 Interface élégante** : Design moderne avec dégradé violet/bleu et animations fluides
-- **⚡ Chargement rapide** : Les médias sont chargés de manière optimisée avec lazy loading
-- **📱 Responsive** : S'adapte parfaitement aux écrans mobiles et desktop
+<table>
+<tr>
+<td width="50%">
+<img src="screenshots/before.png" alt="Before - Without extension" />
+<p align="center"><em>Before: Standard gog-games.to page</em></p>
+</td>
+<td width="50%">
+<img src="screenshots/after.png" alt="After - With extension" />
+<p align="center"><em>After: Enhanced with GOG Database media</em></p>
+</td>
+</tr>
+</table>
+
+## ✨ Features
+
+This extension enhances your browsing experience on gog-games.to by automatically adding:
+
+- **📸 Screenshot Gallery**: Displays all screenshots available on GOG Database
+- **🎬 Video Gallery**: Embeds trailers and promotional videos
+- **🎨 Clean Interface**: Design matching gog-games.to visual style
+- **⚡ Fast Loading**: Optimized media loading with lazy loading
+- **📱 Responsive**: Perfectly adapts to mobile and desktop screens
+- **⚠️ Error Handling**: Clear messages when API fails or no media is found
 
 ## 🚀 Installation
 
-### Installation manuelle (développement)
+### Manual Installation (Development)
 
-1. Téléchargez ou clonez ce repository :
+1. Download or clone this repository:
    ```bash
    git clone https://github.com/all3f0r1/gog-games-extended-firefox.git
    ```
 
-2. Ouvrez Firefox et accédez à `about:debugging#/runtime/this-firefox`
+2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
 
-3. Cliquez sur **"Charger un module complémentaire temporaire..."**
+3. Click **"Load Temporary Add-on..."**
 
-4. Sélectionnez le fichier `manifest.json` dans le dossier de l'extension
+4. Select the `manifest.json` file in the extension folder
 
-5. L'extension est maintenant active ! Visitez une page de jeu sur gog-games.to pour voir les médias.
+5. The extension is now active! Visit a game page on gog-games.to to see the media.
 
-### Installation depuis Firefox Add-ons (à venir)
+### Installation from Firefox Add-ons (Coming Soon)
 
-L'extension sera bientôt disponible sur le store officiel Firefox Add-ons.
+The extension will soon be available on the official Firefox Add-ons store.
 
-## 📖 Utilisation
+## 📖 Usage
 
-1. Naviguez vers n'importe quelle page de jeu sur [gog-games.to](https://gog-games.to)
-   - Par exemple : https://gog-games.to/game/frostpunk_2
+1. Navigate to any game page on [gog-games.to](https://gog-games.to)
+   - For example: https://gog-games.to/game/frostpunk_2
 
-2. Attendez que la page charge complètement
+2. Wait for the page to load completely
 
-3. **Cliquez sur le bouton "More"** pour révéler les liens (le lien GOGDB doit être visible)
+3. **Click the "More" button** to reveal the links (GOGDB link must be visible)
 
-4. Une section "🎮 Médias GOG Database" apparaît automatiquement avec :
-   - Les vidéos (trailers, gameplay, etc.)
-   - Les captures d'écran en haute qualité
+4. A "🎮 GOG Database Media" section appears automatically with:
+   - Videos (trailers, gameplay, etc.)
+   - High-quality screenshots
 
-5. Cliquez sur une capture d'écran pour l'ouvrir en pleine résolution dans un nouvel onglet
+5. Click on a screenshot to open it in full resolution in a new tab
 
-6. Cliquez sur une vidéo pour la lire directement sur la page
+6. Click on a video to play it directly on the page
 
-## 🔧 Fonctionnement technique
+## 🔧 Technical Details
 
-L'extension utilise les technologies suivantes :
+The extension uses the following technologies:
 
 ### Architecture
 
-- **Manifest V3** : Standard moderne pour les extensions Firefox
-- **Background Script** : Gère les requêtes API pour contourner CORS
-- **Content Script** : Injecte le contenu dans les pages gog-games.to
-- **Message Passing** : Communication entre background et content scripts
-- **Host Permissions** : Autorisations pour contourner les restrictions CORS
+- **Manifest V3**: Modern standard for Firefox extensions
+- **Background Script**: Handles API requests to bypass CORS
+- **Content Script**: Injects content into gog-games.to pages
+- **Message Passing**: Communication between background and content scripts
+- **Host Permissions**: Permissions to bypass CORS restrictions
 
 ### Workflow
 
-1. Le content script détecte la page de jeu sur gog-games.to
-2. Un **MutationObserver** surveille le chargement dynamique du contenu (SPA)
-3. Extraction du lien vers GOG Database présent sur la page
-4. Récupération du Product ID depuis l'URL GOGDB
-5. Le content script envoie un message au background script avec le Product ID
-6. Le **background script** effectue la requête vers l'API JSON de GOGDB (bypass CORS)
-7. Le background script renvoie les données au content script
-8. Parsing des données (screenshots, vidéos)
-9. Construction et injection d'une galerie HTML/CSS dans la page
-10. Chargement optimisé des images (miniatures puis pleine résolution)
+1. Content script detects the game page on gog-games.to
+2. A **MutationObserver** monitors dynamic content loading (SPA)
+3. Extracts the GOG Database link present on the page
+4. Retrieves the Product ID from the GOGDB URL
+5. Content script sends a message to the background script with the Product ID
+6. The **background script** performs the request to the GOGDB JSON API (CORS bypass)
+7. Background script returns the data to the content script
+8. Parses the data (screenshots, videos)
+9. Builds and injects an HTML/CSS gallery into the page
+10. Optimized image loading (thumbnails then full resolution)
 
-### Pourquoi un background script ?
+### Why a Background Script?
 
-Les **content scripts** sont exécutés dans le contexte de la page web et sont soumis aux restrictions CORS, même avec les permissions déclarées dans le manifest. Seuls les **background scripts** peuvent effectuer des requêtes cross-origin en utilisant les `host_permissions`.
+**Content scripts** run in the page context and are subject to CORS restrictions, even with permissions declared in the manifest. Only **background scripts** can make cross-origin requests using `host_permissions`.
 
-### Permissions requises
+### Required Permissions
 
-L'extension demande les permissions suivantes :
+The extension requests the following permissions:
 
-- `*://gog-games.to/*` : Pour injecter le contenu sur les pages de jeux
-- `https://www.gogdb.org/*` : Pour récupérer les données de l'API GOGDB
-- `https://images.gog-statics.com/*` : Pour charger les images hébergées par GOG
+- `*://gog-games.to/*`: To inject content on game pages
+- `https://www.gogdb.org/*`: To retrieve data from the GOGDB API
+- `https://images.gog-statics.com/*`: To load images hosted by GOG
 
-Ces permissions permettent au background script de contourner les restrictions CORS.
+These permissions allow the background script to bypass CORS restrictions.
 
-## 📁 Structure du projet
+## 📁 Project Structure
 
 ```
 gog-games-extended-firefox/
-├── manifest.json              # Configuration de l'extension
-├── icons/                     # Icônes de l'extension
-│   ├── icon-48.png           # Icône 48x48
-│   └── icon-96.png           # Icône 96x96
-├── src/                       # Code source
-│   ├── background.js         # Background script (gestion API)
-│   ├── content-script.js     # Content script (injection UI)
-│   └── styles.css            # Styles pour les galeries
-├── CHANGELOG.md               # Historique des versions
-├── test_extension.md          # Guide de test
-├── LICENSE                    # Licence MIT
+├── manifest.json              # Extension configuration
+├── icons/                     # Extension icons
+│   ├── icon-48.png           # 48x48 icon
+│   └── icon-96.png           # 96x96 icon
+├── src/                       # Source code
+│   ├── background.js         # Background script (API handling)
+│   ├── content-script.js     # Content script (UI injection)
+│   └── styles.css            # Styles for galleries
+├── screenshots/               # Before/After screenshots
+│   ├── before.png            # Before extension
+│   └── after.png             # After extension
+├── CHANGELOG.md               # Version history
+├── test_extension.md          # Testing guide
+├── LICENSE                    # MIT License
 └── README.md                  # Documentation
 ```
 
-## 🛠️ Développement
+## 🛠️ Development
 
-### Prérequis
+### Prerequisites
 
-- Firefox Developer Edition (recommandé) ou Firefox stable
-- Éditeur de code (VS Code, Sublime Text, etc.)
+- Firefox Developer Edition (recommended) or Firefox stable
+- Code editor (VS Code, Sublime Text, etc.)
 
-### Modifications
+### Making Changes
 
-Pour modifier l'extension :
+To modify the extension:
 
-1. Éditez les fichiers dans le dossier `src/`
-2. Rechargez l'extension dans `about:debugging`
-3. Rafraîchissez la page gog-games.to pour voir les changements
+1. Edit files in the `src/` folder
+2. Reload the extension in `about:debugging`
+3. Refresh the gog-games.to page to see changes
 
-### Débogage
+### Debugging
 
-- Ouvrez la console du navigateur (F12) sur une page gog-games.to
-- Les logs du content script sont préfixés par `[GOG Games Extended]`
-- Pour voir les logs du background script, allez dans `about:debugging` > "Inspecter" l'extension
-- Inspectez les éléments injectés avec l'inspecteur DOM
+- Open the browser console (F12) on a gog-games.to page
+- Content script logs are prefixed with `[GOG Games Extended]`
+- To see background script logs, go to `about:debugging` > "Inspect" the extension
+- Inspect injected elements with the DOM inspector
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues ! Pour contribuer :
+Contributions are welcome! To contribute:
 
-1. Forkez le projet
-2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
+1. Fork the project
+2. Create a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 Changelog
 
-Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique complet des versions.
+See [CHANGELOG.md](CHANGELOG.md) for complete version history.
 
-### Version actuelle : 1.2.0 (2025-11-08)
+### Current Version: 1.3.0 (2025-11-08)
 
-**🔧 Corrections critiques**
-- Fix CORS : Ajout d'un background script pour gérer les requêtes API
-- Les content scripts ne peuvent pas utiliser `host_permissions` dans Firefox
-- Communication via `browser.runtime.sendMessage` entre scripts
+**✨ New Features**
+- Redesigned CSS to match gog-games.to visual style
+- Error handling with clear user messages
+- Full English translation of all content
 
-## ⚠️ Avertissement
+**🎨 Design Changes**
+- Removed gradient background for cleaner look
+- Purple accent color (#6a4da5) matching site theme
+- Simplified borders and sections
+- Better responsive design
+- Cleaner animations
 
-Cette extension est un projet indépendant et n'est pas affiliée à GOG, CD Projekt, ou gog-games.to. Elle utilise les données publiquement accessibles de GOG Database pour améliorer l'expérience utilisateur.
+**🐛 Bug Fixes**
+- Display error message when GOGDB API fails
+- Show info message when game has no media
+- Better error logging for debugging
 
-## 📄 Licence
+## ⚠️ Disclaimer
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+This extension is an independent project and is not affiliated with GOG, CD Projekt, or gog-games.to. It uses publicly accessible data from GOG Database to enhance the user experience.
 
-## 🙏 Remerciements
+## 📄 License
 
-- [GOG Database](https://www.gogdb.org) pour l'API et les données
-- [gog-games.to](https://gog-games.to) pour la plateforme
-- La communauté Firefox pour les outils de développement d'extensions
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [GOG Database](https://www.gogdb.org) for the API and data
+- [gog-games.to](https://gog-games.to) for the platform
+- The Firefox community for extension development tools
 
 ## 📧 Contact
 
-Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub.
+For any questions or suggestions, feel free to open an issue on GitHub.
 
 ---
 
-**Développé avec ❤️ par Manus AI**
+**Developed with ❤️ by Manus AI**
