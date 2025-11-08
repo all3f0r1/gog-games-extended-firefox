@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2025-11-08
+
+### 🐛 Critical Bug Fix
+- **Fix SPA navigation**: Extension now works when navigating from homepage to game page
+- Content script now injected on all gog-games.to pages (not just /game/*)
+- Improved URL change detection with better state reset
+- Added popstate event listener for browser back/forward navigation
+- Increased delay to 1.5s after URL change for better stability
+
+### 📝 Technical Details
+The content script was only injected on `/game/*` pages, so when navigating from the homepage via SPA (Single Page Application), the script was never loaded. Now the script is injected on all pages and properly detects when the URL changes to a game page.
+
 ## [1.3.0] - 2025-11-08
 
 ### ✨ New Features

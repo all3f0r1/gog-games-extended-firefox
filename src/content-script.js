@@ -1,7 +1,7 @@
 /**
  * GOG Games Extended - Content Script
  * Enriches gog-games.to pages with media from GOG Database
- * Version 1.3.0 - Better styling, error handling, and English translation
+ * Version 1.3.1 - Fix SPA navigation from homepage
  */
 
 (function() {
@@ -327,19 +327,55 @@
     processPage();
   }, 1000);
 
-  // Listen for URL changes (SPA navigation)
+  // Listen for URL changes (SPA navigation) with better detection
   let lastUrl = location.href;
-  new MutationObserver(() => {
+  const urlObserver = new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
       lastUrl = url;
-      console.log('[GOG Games Extended] URL changed, resetting');
+      console.log('[GOG Games Extended] URL changed to:', url);
+      
+      // Remove old container if exists
+      const oldContainer = document.getElementById('gge-media-container');
+      if (oldContainer) {
+        oldContainer.remove();
+      }
+      
+      // Reset state
       mediaInjected = false;
       processingInProgress = false;
       currentUrl = url;
-      setTimeout(() => processPage(), 1000);
+      
+      // Process if it's a game page
+      if (url.includes('/game/')) {
+        console.log('[GOG Games Extended] Detected game page, will process');
+        setTimeout(() => processPage(), 1500);
+      }
     }
-  }).observe(document, {subtree: true, childList: true});
+  });
+  
+  urlObserver.observe(document, {subtree: true, childList: true});
+  
+  // Also listen to popstate event for browser back/forward
+  window.addEventListener('popstate', () => {
+    console.log('[GOG Games Extended] Popstate event detected');
+    const url = location.href;
+    if (url !== lastUrl) {
+      lastUrl = url;
+      mediaInjected = false;
+      processingInProgress = false;
+      currentUrl = url;
+      
+      const oldContainer = document.getElementById('gge-media-container');
+      if (oldContainer) {
+        oldContainer.remove();
+      }
+      
+      if (url.includes('/game/')) {
+        setTimeout(() => processPage(), 1500);
+      }
+    }
+  });
 
   console.log('[GOG Games Extended] Observer activated');
 
