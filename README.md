@@ -2,7 +2,7 @@
 
 A Firefox extension that enriches [gog-games.to](https://gog-games.to) pages with media (screenshots and videos) from [GOG Database](https://www.gogdb.org).
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-Compatible-orange.svg)
 
@@ -33,8 +33,13 @@ This extension enhances your browsing experience on gog-games.to by automaticall
 - **⚡ Fast Loading**: Optimized media loading with lazy loading
 - **📱 Responsive**: Perfectly adapts to mobile and desktop screens
 - **⚠️ Error Handling**: Clear messages when API fails or no media is found
+- **🔒 Privacy-Focused**: No data collection, no tracking, no analytics
 
 ## 🚀 Installation
+
+### From Firefox Add-ons (Recommended - Coming Soon)
+
+The extension will soon be available on the official Firefox Add-ons store.
 
 ### Manual Installation (Development)
 
@@ -50,10 +55,6 @@ This extension enhances your browsing experience on gog-games.to by automaticall
 4. Select the `manifest.json` file in the extension folder
 
 5. The extension is now active! Visit a game page on gog-games.to to see the media.
-
-### Installation from Firefox Add-ons (Coming Soon)
-
-The extension will soon be available on the official Firefox Add-ons store.
 
 ## 📖 Usage
 
@@ -126,8 +127,13 @@ gog-games-extended-firefox/
 ├── screenshots/               # Before/After screenshots
 │   ├── before.png            # Before extension
 │   └── after.png             # After extension
+├── submission/                # AMO submission package
+│   ├── gog-games-extended-1.3.1.zip
+│   ├── AMO_LISTING.md
+│   ├── PRIVACY_POLICY.md
+│   └── SUBMISSION_GUIDE.md
 ├── CHANGELOG.md               # Version history
-├── test_extension.md          # Testing guide
+├── PRIVACY_POLICY.md          # Privacy policy
 ├── LICENSE                    # MIT License
 └── README.md                  # Documentation
 ```
@@ -154,6 +160,15 @@ To modify the extension:
 - To see background script logs, go to `about:debugging` > "Inspect" the extension
 - Inspect injected elements with the DOM inspector
 
+### Building for Distribution
+
+To create a distribution package:
+
+```bash
+cd /path/to/gog-games-extended-firefox
+zip -r dist/gog-games-extended-1.3.1.zip manifest.json icons/ src/
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! To contribute:
@@ -168,24 +183,30 @@ Contributions are welcome! To contribute:
 
 See [CHANGELOG.md](CHANGELOG.md) for complete version history.
 
-### Current Version: 1.3.0 (2025-11-08)
+### Current Version: 1.3.1 (2025-11-08)
 
-**✨ New Features**
-- Redesigned CSS to match gog-games.to visual style
-- Error handling with clear user messages
-- Full English translation of all content
+**🐛 Critical Bug Fix**
+- Extension now works when navigating from homepage to game page
+- Content script injected on all gog-games.to pages (not just /game/*)
+- Improved URL change detection with better state reset
+- Added popstate event listener for browser back/forward navigation
 
-**🎨 Design Changes**
-- Removed gradient background for cleaner look
-- Purple accent color (#6a4da5) matching site theme
-- Simplified borders and sections
-- Better responsive design
-- Cleaner animations
+## 🔒 Privacy
 
-**🐛 Bug Fixes**
-- Display error message when GOGDB API fails
-- Show info message when game has no media
-- Better error logging for debugging
+This extension does not collect, store, or transmit any personal data. It only fetches publicly available game information from GOG Database to enhance your browsing experience.
+
+See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for details.
+
+## 📦 AMO Submission
+
+Ready to submit to Firefox Add-ons? Check the `submission/` folder for:
+- Extension package (ZIP)
+- Screenshots
+- Listing information
+- Privacy policy
+- Step-by-step submission guide
+
+See [submission/SUBMISSION_GUIDE.md](submission/SUBMISSION_GUIDE.md) for detailed instructions.
 
 ## ⚠️ Disclaimer
 
@@ -203,7 +224,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 📧 Contact
 
-For any questions or suggestions, feel free to open an issue on GitHub.
+For questions, suggestions, or bug reports, please open an issue on GitHub:
+https://github.com/all3f0r1/gog-games-extended-firefox/issues
 
 ---
 
