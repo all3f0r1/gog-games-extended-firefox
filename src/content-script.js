@@ -1,7 +1,7 @@
 /**
  * GOG Games Extended - Content Script
  * Enrichit les pages de gog-games.to avec des médias provenant de GOG Database
- * Version 1.2.0 - Support pour SPA + Background script pour CORS
+ * Version 1.2.1 - Fix injection timing and placement
  */
 
 (function() {
@@ -11,6 +11,7 @@
 
   let mediaInjected = false;
   let currentUrl = window.location.href;
+  let processingInProgress = false;
 
   // Fonction pour extraire le product ID depuis le lien GOGDB
   function extractProductId() {
@@ -43,7 +44,7 @@
       });
       
       if (response.success) {
-        console.log('[GOG Games Extended] Données récupérées:', response.data);
+        console.log('[GOG Games Extended] Données récupérées avec succès');
         return response.data;
       } else {
         console.error('[GOG Games Extended] Erreur du background script:', response.error);
@@ -161,18 +162,29 @@
     return gallery;
   }
 
+  // Fonction pour trouver le meilleur point d'insertion
+  function findInsertionPoint() {
+    // Chercher le titre du jeu (h1 ou h2)
+    const gameTitle = document.querySelector('h1, h2');
+    if (gameTitle) {
+      return { element: gameTitle, position: 'afterend' };
+    }
+
+    // Fallback: chercher le bouton "More"
+    const moreButton = Array.from(document.querySelectorAll('label')).find(l => l.textContent.trim() === 'More');
+    if (moreButton && moreButton.parentElement) {
+      return { element: moreButton.parentElement, position: 'afterend' };
+    }
+
+    // Dernier recours: body
+    return { element: document.body, position: 'beforeend' };
+  }
+
   // Fonction pour injecter les galeries dans la page
   function injectMediaGalleries(data) {
     // Vérifier si déjà injecté
     if (document.getElementById('gge-media-container')) {
-      console.log('[GOG Games Extended] Galeries déjà injectées');
-      return;
-    }
-
-    // Trouver le bouton "More" ou un conteneur approprié
-    const moreButton = Array.from(document.querySelectorAll('label')).find(l => l.textContent.trim() === 'More');
-    if (!moreButton || !moreButton.parentElement) {
-      console.log('[GOG Games Extended] Impossible de trouver un point d\'insertion');
+      console.log('[GOG Games Extended] Galeries déjà injectées, skip');
       return;
     }
 
@@ -202,8 +214,9 @@
       }
     }
 
-    // Insérer après le bouton More
-    moreButton.parentElement.insertAdjacentElement('afterend', mediaContainer);
+    // Trouver le meilleur point d'insertion
+    const insertion = findInsertionPoint();
+    insertion.element.insertAdjacentElement(insertion.position, mediaContainer);
 
     console.log('[GOG Games Extended] Galeries injectées avec succès');
     mediaInjected = true;
@@ -220,6 +233,7 @@
     // Réinitialiser si on change de page
     if (currentUrl !== window.location.href) {
       mediaInjected = false;
+      processingInProgress = false;
       currentUrl = window.location.href;
       // Supprimer l'ancien conteneur s'il existe
       const oldContainer = document.getElementById('gge-media-container');
@@ -228,15 +242,19 @@
       }
     }
 
-    // Ne pas réinjecter si déjà fait
-    if (mediaInjected) {
+    // Ne pas réinjecter si déjà fait ou en cours
+    if (mediaInjected || processingInProgress) {
       return;
     }
+
+    // Marquer comme en cours de traitement
+    processingInProgress = true;
 
     // Attendre que le lien GOGDB soit disponible
     const productId = extractProductId();
     if (!productId) {
       console.log('[GOG Games Extended] Product ID non disponible, réessai plus tard');
+      processingInProgress = false;
       return;
     }
 
@@ -244,6 +262,8 @@
     const data = await fetchGOGDBData(productId);
     if (!data) {
       console.log('[GOG Games Extended] Impossible de récupérer les données');
+      processingInProgress = false;
+      mediaInjected = true; // Marquer comme traité pour ne pas réessayer indéfiniment
       return;
     }
 
@@ -253,21 +273,29 @@
     
     if (!hasMedia) {
       console.log('[GOG Games Extended] Aucun média trouvé pour ce jeu');
+      processingInProgress = false;
       mediaInjected = true; // Marquer comme traité pour ne pas réessayer
       return;
     }
 
     // Injecter les galeries
     injectMediaGalleries(data);
+    processingInProgress = false;
   }
 
   // Observer les changements du DOM pour détecter le chargement du contenu
   const observer = new MutationObserver((mutations) => {
+    // Ne traiter que si pas déjà en cours et pas déjà injecté
+    if (processingInProgress || mediaInjected) {
+      return;
+    }
+
     // Vérifier si le lien GOGDB est maintenant disponible
     const gogdbLink = document.querySelector('a[href*="gogdb.org/product/"]');
-    if (gogdbLink && !mediaInjected) {
+    if (gogdbLink) {
       console.log('[GOG Games Extended] Contenu détecté, traitement de la page');
-      processPage();
+      // Utiliser un petit délai pour s'assurer que le DOM est stable
+      setTimeout(() => processPage(), 500);
     }
   });
 
@@ -294,6 +322,7 @@
       lastUrl = url;
       console.log('[GOG Games Extended] URL changée, réinitialisation');
       mediaInjected = false;
+      processingInProgress = false;
       currentUrl = url;
       setTimeout(() => processPage(), 1000);
     }

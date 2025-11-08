@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GOG Games Extended",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Enrichit les pages de gog-games.to avec des médias (images et vidéos) provenant de GOG Database",
   "author": "Manus AI",
   

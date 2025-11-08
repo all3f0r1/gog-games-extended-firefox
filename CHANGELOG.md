@@ -2,6 +2,18 @@
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
+## [1.2.1] - 2025-11-08
+
+### 🐛 Corrections
+- **Fix injection timing**: Les galeries s'affichent maintenant dès la première visite
+- Amélioration de la logique de détection pour éviter les déclenchements multiples
+- Ajout d'un flag `processingInProgress` pour éviter les traitements simultanés
+- Meilleur point d'insertion des galeries (après le titre du jeu)
+- Délai de 500ms après détection du lien GOGDB pour stabiliser le DOM
+
+### 📝 Détails techniques
+Le MutationObserver déclenchait plusieurs fois le traitement car l'injection elle-même modifiait le DOM. Ajout de protections pour éviter les injections multiples et amélioration du timing.
+
 ## [1.2.0] - 2025-11-08
 
 ### 🔧 Corrections
