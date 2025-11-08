@@ -22,7 +22,7 @@ Cette extension améliore votre expérience de navigation sur gog-games.to en aj
 
 1. Téléchargez ou clonez ce repository :
    ```bash
-   git clone https://github.com/VOTRE_USERNAME/gog-games-extended-firefox.git
+   git clone https://github.com/all3f0r1/gog-games-extended-firefox.git
    ```
 
 2. Ouvrez Firefox et accédez à `about:debugging#/runtime/this-firefox`
