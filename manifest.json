@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GOG Games Extended",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Enriches gog-games.to pages with media (images and videos) from GOG Database",
   "author": "Manus AI",
   
@@ -9,9 +9,7 @@
     "gecko": {
       "id": "gog-games-extended@manus.ai",
       "data_collection_permissions": {
-        "interaction": false,
-        "usage": false,
-        "health": false
+        "required": "none"
       }
     }
   },

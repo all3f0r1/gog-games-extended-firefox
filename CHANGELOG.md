@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3] - 2025-11-08
+
+### 🐛 Bug Fix - AMO Validation
+- **Fixed data_collection_permissions structure**: Added required `"required"` property with value `"none"`
+- Previous structure with `interaction`, `usage`, `health` was incorrect
+- Correct structure according to Mozilla documentation: `{"required": "none"}` for extensions that don't collect data
+
+### 📝 Technical Details
+The `data_collection_permissions` object must contain a `required` property that specifies what data the extension requires to collect. Since this extension doesn't collect any data, the value is `"none"`.
+
 ## [1.3.2] - 2025-11-08
 
 ### 🐛 Bug Fixes - AMO Validation

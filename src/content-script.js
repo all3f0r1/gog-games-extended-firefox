@@ -1,7 +1,7 @@
 /**
  * GOG Games Extended - Content Script
  * Enriches gog-games.to pages with media from GOG Database
- * Version 1.3.2 - AMO validation fixes
+ * Version 1.3.3 - AMO validation fix for data_collection_permissions
  */
 
 (function() {
